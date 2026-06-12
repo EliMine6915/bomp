@@ -6,6 +6,8 @@
     --muted: #9b9b9b;
     --accent: #ff7a1a;
     --border: #262626;
+    --error: #e5484d;
+    --success: #30a46c;
 }
 
 * {
@@ -220,6 +222,70 @@ h1 {
 
 .add-btn:hover {
     transform: scale(1.05);
+}
+
+/* --- NEU: FEHLERMELDUNGEN (TOASTS) --- */
+.notification-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 100;
+    max-width: 360px;
+    width: calc(100% - 48px);
+}
+
+.toast {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    animation: slideIn 0.3s ease forwards;
+    transition: 0.3s ease;
+}
+
+.toast i {
+    font-size: 20px;
+}
+
+.toast-text {
+    font-size: 14px;
+    line-height: 1.4;
+    color: var(--text);
+    flex: 1;
+}
+
+/* Farbvarianten */
+.toast.error {
+    border-left: 4px solid var(--error);
+}
+.toast.error i {
+    color: var(--error);
+}
+
+.toast.success {
+    border-left: 4px solid var(--success);
+}
+.toast.success i {
+    color: var(--success);
+}
+
+/* Animation beim Einblenden */
+@keyframes slideIn {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Hilfsklasse zum Ausblenden */
