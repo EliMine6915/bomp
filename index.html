@@ -18,6 +18,23 @@
     <div class="app">
         <h1>Todo</h1>
 
+        <div class="auth-card" id="authCard">
+            <input type="email" id="email" placeholder="E-Mail">
+            <input type="password" id="password" placeholder="Passwort">
+
+            <div class="auth-buttons">
+                <button id="loginBtn">Login</button>
+                <button id="registerBtn">Registrieren</button>
+            </div>
+        </div>
+
+        <div class="user-bar hidden" id="userBar">
+            <span id="userEmail"></span>
+            <button id="logoutBtn">
+                <i class="ph ph-sign-out"></i>
+            </button>
+        </div>
+
         <div class="todo-list" id="todoList"></div>
     </div>
 
