@@ -9,6 +9,7 @@ const todoInput = document.getElementById("todoInput");
 const addBtn = document.getElementById("addBtn");
 const todoList = document.getElementById("todoList");
 const inputContainer = document.getElementById("inputContainer");
+const notificationContainer = document.getElementById("notificationContainer");
 
 const email = document.getElementById("email");
 const password = document.getElementById("password");
@@ -23,6 +24,29 @@ const userEmail = document.getElementById("userEmail");
 let currentUser = null;
 let todoSubscription = null;
 
+// --- FUNKTION FÜR SCHICKE FEHLERMELDUNGEN (TOASTS) ---
+function showToast(message, type = "error") {
+    const toast = document.createElement("div");
+    toast.className = `toast ${type}`;
+
+    // Icon je nach Typ auswählen
+    const icon = type === "success" ? "ph-check-circle" : "ph-warning-circle";
+
+    toast.innerHTML = `
+        <i class="ph ${icon}"></i>
+        <span class="toast-text">${message}</span>
+    `;
+
+    notificationContainer.appendChild(toast);
+
+    // Nach 4 Sekunden automatisch ausblenden und löschen
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        toast.style.transform = "scale(0.95)";
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+
 // --- TO-DO STRUKTUR & FUNKTIONEN ---
 
 async function loadTodos() {
@@ -35,7 +59,7 @@ async function loadTodos() {
         .order("created_at", { ascending: false });
 
     if (error) {
-        console.error("Fehler beim Laden:", error.message);
+        showToast("Fehler beim Laden der Aufgaben: " + error.message, "error");
         return;
     }
 
@@ -60,18 +84,22 @@ function renderTodo(todo) {
 
     // Status ändern
     item.querySelector(".check-btn").addEventListener("click", async () => {
-        await supabase
+        const { error } = await supabase
             .from("todos")
             .update({ completed: !todo.completed })
             .eq("id", todo.id);
+        
+        if (error) showToast("Änderung fehlgeschlagen: " + error.message, "error");
     });
 
     // To-Do löschen
     item.querySelector(".delete-btn").addEventListener("click", async () => {
-        await supabase
+        const { error } = await supabase
             .from("todos")
             .delete()
             .eq("id", todo.id);
+
+        if (error) showToast("Löschen fehlgeschlagen: " + error.message, "error");
     });
 
     todoList.appendChild(item);
@@ -89,7 +117,7 @@ async function addTodo() {
         });
 
     if (error) {
-        alert("Fehler: " + error.message);
+        showToast("Fehler beim Erstellen: " + error.message, "error");
     } else {
         todoInput.value = "";
     }
@@ -125,7 +153,9 @@ async function login() {
     });
 
     if (error) {
-        alert("Login fehlgeschlagen: " + error.message);
+        showToast("Login fehlgeschlagen: " + error.message, "error");
+    } else {
+        showToast("Erfolgreich angemeldet!", "success");
     }
 }
 
@@ -139,15 +169,16 @@ async function register() {
     });
 
     if (error) {
-        alert("Registrierung fehlgeschlagen: " + error.message);
+        showToast("Registrierung fehlgeschlagen: " + error.message, "error");
     } else {
-        alert("Registrierung erfolgreich! Bitte klicke auf den Bestätigungslink in deiner E-Mail.");
+        showToast("Erfolgreich! Bitte bestätige den Link in deinem E-Mail-Postfach.", "success");
     }
 }
 
 async function logout() {
     unsubscribeFromTodos();
     await supabase.auth.signOut();
+    showToast("Erfolgreich abgemeldet.", "success");
 }
 
 // Steuert, welche UI-Elemente je nach Login-Status sichtbar sind
