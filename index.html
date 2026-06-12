@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo</title>
+    <title>Todo App mit Supabase</title>
 
     <link rel="stylesheet" href="style.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
@@ -30,7 +29,7 @@
 
         <div class="user-bar hidden" id="userBar">
             <span id="userEmail"></span>
-            <button id="logoutBtn">
+            <button id="logoutBtn" title="Ausloggen">
                 <i class="ph ph-sign-out"></i>
             </button>
         </div>
@@ -38,14 +37,13 @@
         <div class="todo-list" id="todoList"></div>
     </div>
 
-    <div class="input-container">
+    <div class="input-container hidden" id="inputContainer">
         <div class="input-wrapper">
             <input
                 type="text"
                 id="todoInput"
                 placeholder="Neue Aufgabe hinzufügen..."
             >
-
             <button class="add-btn" id="addBtn">
                 <i class="ph ph-plus"></i>
             </button>
