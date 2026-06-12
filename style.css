@@ -1,0 +1,137 @@
+:root {
+    --bg: #0f0f0f;
+    --surface: #171717;
+    --surface-hover: #1d1d1d;
+    --text: #f4f1ea;
+    --muted: #9b9b9b;
+    --accent: #ff7a1a;
+    --border: #262626;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 20px 140px;
+}
+
+h1 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 32px;
+}
+
+.todo-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.todo-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: 0.2s ease;
+}
+
+.todo-item:hover {
+    background: var(--surface-hover);
+}
+
+.todo-text {
+    flex: 1;
+    font-size: 15px;
+}
+
+.completed .todo-text {
+    text-decoration: line-through;
+    color: var(--muted);
+}
+
+.icon-btn {
+    border: none;
+    background: none;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    transition: 0.2s ease;
+}
+
+.icon-btn:hover {
+    color: var(--accent);
+}
+
+.completed .check-btn {
+    color: var(--accent);
+}
+
+.input-container {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    width: calc(100% - 32px);
+    max-width: 760px;
+}
+
+.input-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.input-wrapper input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 15px;
+    padding: 8px 12px;
+}
+
+.input-wrapper input::placeholder {
+    color: var(--muted);
+}
+
+.add-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 14px;
+    background: var(--accent);
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    display: grid;
+    place-items: center;
+    transition: 0.2s ease;
+}
+
+.add-btn:hover {
+    transform: scale(1.05);
+}
