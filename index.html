@@ -29,7 +29,13 @@
         <div class="auth-card" id="authCard">
             <div class="auth-form">
                 <h2>Welcome</h2>
-                
+
+                <div class="input-group">
+                    <label for="name">Name</label>
+                    <input type="text" id="name" placeholder="Your name" autocomplete="name">
+                    <span class="input-hint" id="nameHint">Only needed when registering</span>
+                </div>
+
                 <div class="input-group">
                     <label for="email">E-Mail</label>
                     <input type="email" id="email" placeholder="your@email.com" required>
@@ -92,7 +98,10 @@
         <div class="user-bar hidden" id="userBar">
             <div class="user-info">
                 <i class="ph ph-user-circle"></i>
-                <span id="userEmail"></span>
+                <div class="user-info-text">
+                    <span id="userName"></span>
+                    <span id="userEmail"></span>
+                </div>
             </div>
             <button id="logoutBtn" class="btn btn-icon" title="Sign Out">
                 <i class="ph ph-sign-out"></i>
