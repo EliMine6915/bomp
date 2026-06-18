@@ -7,12 +7,10 @@
 
     <link rel="stylesheet" href="style.css">
 
-    <!-- Instrument Serif Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
@@ -25,7 +23,6 @@
             <p class="tagline">Manage your tasks with elegance</p>
         </div>
 
-        <!-- AUTH SCREEN -->
         <div class="auth-card" id="authCard">
             <div class="auth-form">
                 <h2>Welcome</h2>
@@ -41,15 +38,10 @@
                     <input type="email" id="email" placeholder="your@email.com" required>
                 </div>
 
-                <div class="input-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" placeholder="••••••••" required>
-                </div>
-
                 <div class="auth-buttons">
                     <button id="loginBtn" class="btn btn-primary">
                         <i class="ph ph-sign-in"></i>
-                        Sign In
+                        Sign In / Get Code
                     </button>
                     <button id="registerBtn" class="btn btn-secondary">
                         <i class="ph ph-user-plus"></i>
@@ -58,29 +50,38 @@
                 </div>
 
                 <div class="auth-hint">
-                    <p>New here? Create an account to get started.</p>
+                    <p>New here? Create an account or sign in via OTP directly.</p>
                 </div>
             </div>
         </div>
 
-        <!-- EMAIL VERIFICATION SCREEN -->
         <div class="auth-card hidden" id="verificationCard">
             <div class="auth-form">
                 <div style="text-align: center; margin-bottom: 24px;">
                     <i class="ph ph-envelope-open" style="font-size: 48px; color: var(--accent); margin-bottom: 12px; display: block;"></i>
                     <h2 style="margin-bottom: 8px;">Check Your Email</h2>
                     <p style="color: var(--text-secondary); font-size: 14px;">
-                        We've sent a confirmation link to:<br>
+                        We've sent a confirmation code to:<br>
                         <strong id="verificationEmail" style="color: var(--accent);"></strong>
                     </p>
                 </div>
 
+                <div class="input-group" style="margin-bottom: 20px;">
+                    <label for="otpCode">Enter 6- to 8-digit Code</label>
+                    <input type="text" id="otpCode" placeholder="12345678" style="text-align: center; font-size: 20px; letter-spacing: 4px;" autocomplete="one-time-code">
+                </div>
+
+                <button id="verifyOtpBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
+                    <i class="ph ph-check-circle"></i>
+                    Verify Code & Sign In
+                </button>
+
                 <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
                     <p><strong>Next steps:</strong></p>
                     <ol style="margin-left: 16px; margin-top: 8px;">
-                        <li>Open the confirmation email</li>
-                        <li>Click the verification link</li>
-                        <li>Return here and sign in</li>
+                        <li>Open your email inbox</li>
+                        <li>Copy the 6- or 8-digit numeric code</li>
+                        <li>Enter it above to access your dashboard</li>
                     </ol>
                 </div>
 
@@ -90,7 +91,7 @@
                 </button>
 
                 <div class="auth-hint" style="margin-top: 16px;">
-                    <p id="resendHint">Didn't receive an email? <button id="resendBtn" style="background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">Resend confirmation</button></p>
+                    <p id="resendHint">Didn't receive a code? <button id="resendBtn" style="background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">Resend code</button></p>
                 </div>
             </div>
         </div>
