@@ -25,6 +25,7 @@
             <p class="tagline">Manage your tasks with elegance</p>
         </div>
 
+        <!-- AUTH SCREEN -->
         <div class="auth-card" id="authCard">
             <div class="auth-form">
                 <h2>Welcome</h2>
@@ -52,6 +53,38 @@
 
                 <div class="auth-hint">
                     <p>New here? Create an account to get started.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EMAIL VERIFICATION SCREEN -->
+        <div class="auth-card hidden" id="verificationCard">
+            <div class="auth-form">
+                <div style="text-align: center; margin-bottom: 24px;">
+                    <i class="ph ph-envelope-open" style="font-size: 48px; color: var(--accent); margin-bottom: 12px; display: block;"></i>
+                    <h2 style="margin-bottom: 8px;">Check Your Email</h2>
+                    <p style="color: var(--text-secondary); font-size: 14px;">
+                        We've sent a confirmation link to:<br>
+                        <strong id="verificationEmail" style="color: var(--accent);"></strong>
+                    </p>
+                </div>
+
+                <div style="background: var(--bg-secondary); border-radius: 12px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">
+                    <p><strong>Next steps:</strong></p>
+                    <ol style="margin-left: 16px; margin-top: 8px;">
+                        <li>Open the confirmation email</li>
+                        <li>Click the verification link</li>
+                        <li>Return here and sign in</li>
+                    </ol>
+                </div>
+
+                <button id="backToAuthBtn" class="btn btn-secondary" style="width: 100%;">
+                    <i class="ph ph-arrow-left"></i>
+                    Back to Sign In
+                </button>
+
+                <div class="auth-hint" style="margin-top: 16px;">
+                    <p id="resendHint">Didn't receive an email? <button id="resendBtn" style="background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">Resend confirmation</button></p>
                 </div>
             </div>
         </div>
