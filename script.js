@@ -17,9 +17,10 @@ const todoList = document.getElementById("todoList");
 const inputContainer = document.getElementById("inputContainer");
 const notificationContainer = document.getElementById("notificationContainer");
 
-const name = document.getElementById("name");
-const email = document.getElementById("email");
-const password = document.getElementById("password");
+// Eindeutige Namen gewählt, um Konflikte mit dem globalen 'window'-Objekt zu vermeiden
+const nameInput = document.getElementById("name");
+const emailInput = document.getElementById("email");
+
 const loginBtn = document.getElementById("loginBtn");
 const registerBtn = document.getElementById("registerBtn");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -34,6 +35,10 @@ const verificationEmail = document.getElementById("verificationEmail");
 const backToAuthBtn = document.getElementById("backToAuthBtn");
 const resendBtn = document.getElementById("resendBtn");
 const resendHint = document.getElementById("resendHint");
+
+// Neue Elemente für die OTP Verifizierung
+const otpCodeInput = document.getElementById("otpCode");
+const verifyOtpBtn = document.getElementById("verifyOtpBtn");
 
 // ============================================
 // STATE
@@ -192,63 +197,22 @@ function unsubscribeFromTodos() {
 }
 
 // ============================================
-// AUTHENTICATION
+// AUTHENTICATION (Auf OTP umgestellt)
 // ============================================
 
-async function login() {
-    const emailValue = email.value.trim();
-    const passwordValue = password.value;
+async function handleOtpRequest(isRegistering = false) {
+    const emailValue = emailInput.value.trim();
+    const nameValue = nameInput.value.trim();
 
-    if (!emailValue || !passwordValue) {
-        showToast("Please enter email and password", "error");
-        return;
-    }
-
-    loginBtn.disabled = true;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email: emailValue,
-        password: passwordValue
-    });
-
-    loginBtn.disabled = false;
-
-    if (error) {
-        console.error("Login error:", error);
-        
-        if (error.message.includes("Email not confirmed")) {
-            showToast("Please confirm your email address first", "error");
-            // Show verification screen
-            registeredEmail = emailValue;
-            showVerificationScreen(emailValue);
-        } else if (error.message.includes("Invalid login credentials")) {
-            showToast("Invalid email or password", "error");
-        } else {
-            showToast("Sign in failed: " + error.message, "error");
-        }
-    } else {
-        showToast("Welcome back!", "success");
-    }
-}
-
-async function register() {
-    const nameValue = name.value.trim();
-    const emailValue = email.value.trim();
-    const passwordValue = password.value;
-
-    if (!nameValue) {
+    if (isRegistering && !nameValue) {
         showToast("Please enter your name", "error");
-        name.focus();
+        nameInput.focus();
         return;
     }
 
-    if (!emailValue || !passwordValue) {
-        showToast("Please enter email and password", "error");
-        return;
-    }
-
-    if (passwordValue.length < 6) {
-        showToast("Password must be at least 6 characters", "error");
+    if (!emailValue) {
+        showToast("Please enter your email address", "error");
+        emailInput.focus();
         return;
     }
 
@@ -258,36 +222,63 @@ async function register() {
         return;
     }
 
+    loginBtn.disabled = true;
     registerBtn.disabled = true;
 
-    const { data, error } = await supabase.auth.signUp({
+    // Fordert ein numerisches OTP per E-Mail an.
+    // Falls der User neu ist, legt 'shouldCreateUser: true' den Account an.
+    const { data, error } = await supabase.auth.signInWithOtp({
         email: emailValue,
-        password: passwordValue,
         options: {
-            data: {
-                full_name: nameValue
-            },
-            emailRedirectTo: window.location.origin
+            data: isRegistering ? { full_name: nameValue } : {},
+            shouldCreateUser: isRegistering
         }
     });
 
+    loginBtn.disabled = false;
     registerBtn.disabled = false;
 
     if (error) {
-        console.error("Registration error:", error);
-        
-        if (error.message.includes("already registered")) {
-            showToast("This email is already registered. Please log in instead.", "error");
-        } else if (error.message.includes("invalid")) {
-            showToast("Invalid email format", "error");
-        } else {
-            showToast("Registration failed: " + error.message, "error");
-        }
+        console.error("OTP Request Error:", error);
+        showToast("Authentication failed: " + error.message, "error");
     } else {
-        // Show verification screen
         registeredEmail = emailValue;
         showVerificationScreen(emailValue);
-        showToast("Check your email to confirm registration!", "success");
+        showToast("Verification code sent to your email!", "success");
+    }
+}
+
+async function verifyOtpCode() {
+    const code = otpCodeInput.value.trim();
+    
+    if (!code) {
+        showToast("Please enter the verification code", "error");
+        otpCodeInput.focus();
+        return;
+    }
+
+    if (!registeredEmail) {
+        showToast("Session expired. Please request a new code.", "error");
+        hideVerificationScreen();
+        return;
+    }
+
+    verifyOtpBtn.disabled = true;
+
+    // Verifiziert den 6-8 stelligen Code beim Server
+    const { data, error } = await supabase.auth.verifyOtp({
+        email: registeredEmail,
+        token: code,
+        type: 'email'
+    });
+
+    verifyOtpBtn.disabled = false;
+
+    if (error) {
+        console.error("Verification Error:", error);
+        showToast("Invalid or expired code. Please try again.", "error");
+    } else {
+        showToast("Successfully signed in!", "success");
     }
 }
 
@@ -301,17 +292,16 @@ async function resendConfirmationEmail() {
 
     resendBtn.disabled = true;
 
-    const { error } = await supabase.auth.resend({
-        type: 'signup',
+    const { error } = await supabase.auth.signInWithOtp({
         email: registeredEmail
     });
 
     if (error) {
         console.error("Resend error:", error);
-        showToast("Failed to resend: " + error.message, "error");
+        showToast("Failed to resend code: " + error.message, "error");
         resendBtn.disabled = false;
     } else {
-        showToast("Confirmation email sent!", "success");
+        showToast("New code sent successfully!", "success");
         
         // Start countdown
         resendCountdown = 60;
@@ -321,7 +311,7 @@ async function resendConfirmationEmail() {
             resendCountdown--;
             if (resendCountdown <= 0) {
                 clearInterval(interval);
-                resendBtn.textContent = "Resend confirmation";
+                resendBtn.textContent = "Resend code";
                 resendBtn.disabled = false;
             } else {
                 resendBtn.textContent = "Resend (" + resendCountdown + "s)";
@@ -351,9 +341,9 @@ async function logout() {
 // ============================================
 
 function showVerificationScreen(emailValue) {
-    name.value = "";
-    email.value = "";
-    password.value = "";
+    nameInput.value = "";
+    emailInput.value = "";
+    otpCodeInput.value = "";
     verificationEmail.textContent = emailValue;
     
     authCard.classList.add("hidden");
@@ -363,7 +353,7 @@ function showVerificationScreen(emailValue) {
     
     resendCountdown = 0;
     resendBtn.disabled = false;
-    resendBtn.textContent = "Resend confirmation";
+    resendBtn.textContent = "Resend code";
 }
 
 function hideVerificationScreen() {
@@ -387,9 +377,8 @@ function handleAuthStateChange(session) {
         inputContainer.classList.add("hidden");
         unsubscribeFromTodos();
 
-        name.value = "";
-        email.value = "";
-        password.value = "";
+        nameInput.value = "";
+        emailInput.value = "";
     } else {
         // User is logged in
         currentUser = session.user;
@@ -410,28 +399,30 @@ function handleAuthStateChange(session) {
 // EVENT LISTENERS
 // ============================================
 
-loginBtn.addEventListener("click", login);
-registerBtn.addEventListener("click", register);
+loginBtn.addEventListener("click", () => handleOtpRequest(false));
+registerBtn.addEventListener("click", () => handleOtpRequest(true));
+verifyOtpBtn.addEventListener("click", verifyOtpCode);
+
 logoutBtn.addEventListener("click", logout);
 addBtn.addEventListener("click", addTodo);
 backToAuthBtn.addEventListener("click", hideVerificationScreen);
 resendBtn.addEventListener("click", resendConfirmationEmail);
 
-name.addEventListener("keydown", e => {
+nameInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
-        email.focus();
+        emailInput.focus();
     }
 });
 
-email.addEventListener("keydown", e => {
+emailInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
-        password.focus();
+        handleOtpRequest(false);
     }
 });
 
-password.addEventListener("keydown", e => {
+otpCodeInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
-        login();
+        verifyOtpCode();
     }
 });
 
@@ -444,16 +435,6 @@ todoInput.addEventListener("keydown", e => {
 // ============================================
 // INITIALIZATION
 // ============================================
-
-// Check for verification token in URL
-window.addEventListener('load', async () => {
-    const hash = window.location.hash;
-    
-    if (hash.includes('type=signup') || hash.includes('access_token')) {
-        // URL has auth callback, let Supabase handle it
-        const result = await supabase.auth.getSession();
-    }
-});
 
 // Check for existing session on page load
 supabase.auth.onAuthStateChange((event, session) => {
