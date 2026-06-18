@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>bomp</title>
+    <title>bomp – Todo App</title>
 
     <link rel="stylesheet" href="style.css">
 
+    <!-- Instrument Serif Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
 <body>
@@ -17,21 +20,48 @@
     <div class="notification-container" id="notificationContainer"></div>
 
     <div class="app">
-        <h1>Todo</h1>
+        <div class="header">
+            <h1>bomp</h1>
+            <p class="tagline">Manage your tasks with elegance</p>
+        </div>
 
         <div class="auth-card" id="authCard">
-            <input type="email" id="email" placeholder="E-Mail">
-            <input type="password" id="password" placeholder="Passwort">
+            <div class="auth-form">
+                <h2>Welcome</h2>
+                
+                <div class="input-group">
+                    <label for="email">E-Mail</label>
+                    <input type="email" id="email" placeholder="your@email.com" required>
+                </div>
 
-            <div class="auth-buttons">
-                <button id="loginBtn">Login</button>
-                <button id="registerBtn">Registrieren</button>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="auth-buttons">
+                    <button id="loginBtn" class="btn btn-primary">
+                        <i class="ph ph-sign-in"></i>
+                        Sign In
+                    </button>
+                    <button id="registerBtn" class="btn btn-secondary">
+                        <i class="ph ph-user-plus"></i>
+                        Register
+                    </button>
+                </div>
+
+                <div class="auth-hint">
+                    <p>New here? Create an account to get started.</p>
+                </div>
             </div>
         </div>
 
         <div class="user-bar hidden" id="userBar">
-            <span id="userEmail"></span>
-            <button id="logoutBtn" title="Ausloggen">
+            <div class="user-info">
+                <i class="ph ph-user-circle"></i>
+                <span id="userEmail"></span>
+            </div>
+            <button id="logoutBtn" class="btn btn-icon" title="Sign Out">
                 <i class="ph ph-sign-out"></i>
             </button>
         </div>
@@ -44,9 +74,10 @@
             <input
                 type="text"
                 id="todoInput"
-                placeholder="Neue Aufgabe hinzufügen..."
+                placeholder="Add a new task..."
+                autocomplete="off"
             >
-            <button class="add-btn" id="addBtn">
+            <button class="add-btn" id="addBtn" title="Add task">
                 <i class="ph ph-plus"></i>
             </button>
         </div>
