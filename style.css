@@ -156,19 +156,24 @@ h2 {
     letter-spacing: 0.3px;
 }
 
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 .btn-primary {
     background: var(--accent);
     color: white;
     flex: 1;
 }
 
-.btn-primary:hover {
+.btn-primary:hover:not(:disabled) {
     background: var(--accent-dark);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(198, 108, 90, 0.3);
 }
 
-.btn-primary:active {
+.btn-primary:active:not(:disabled) {
     transform: translateY(0);
 }
 
@@ -179,7 +184,7 @@ h2 {
     flex: 1;
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
     background: var(--surface-hover);
     border-color: var(--accent);
 }
@@ -191,7 +196,7 @@ h2 {
     border: 1px solid var(--border);
 }
 
-.btn-icon:hover {
+.btn-icon:hover:not(:disabled) {
     background: var(--error-light);
     color: var(--error);
     border-color: var(--error);
@@ -209,6 +214,12 @@ h2 {
     font-size: 13px;
     color: var(--text-muted);
     margin-top: 12px;
+}
+
+.auth-hint button:disabled {
+    color: var(--text-muted);
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* --- USER BAR --- */
@@ -359,13 +370,18 @@ h2 {
     transition: all 0.3s ease;
 }
 
-.add-btn:hover {
+.add-btn:hover:not(:disabled) {
     background: var(--accent-dark);
     transform: scale(1.05);
 }
 
-.add-btn:active {
+.add-btn:active:not(:disabled) {
     transform: scale(0.95);
+}
+
+.add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* --- NOTIFICATIONS/TOASTS --- */
@@ -436,6 +452,18 @@ h2 {
         transform: translateX(0);
         opacity: 1;
     }
+}
+
+/* --- VERIFICATION SCREEN SPECIFIC --- */
+
+#verificationCard ol {
+    margin-left: 16px;
+    margin-top: 8px;
+    color: inherit;
+}
+
+#verificationCard li {
+    margin-bottom: 4px;
 }
 
 /* --- UTILITY CLASSES --- */
