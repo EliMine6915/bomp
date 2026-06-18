@@ -551,3 +551,33 @@ h2 {
         transition-duration: 0.01ms !important;
     }
 }
+
+/* --- AUTH SWITCH TABS --- */
+.auth-toggle {
+    display: flex;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+}
+
+.toggle-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 10px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.toggle-tab.active {
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
