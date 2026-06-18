@@ -17,6 +17,7 @@ const todoList = document.getElementById("todoList");
 const inputContainer = document.getElementById("inputContainer");
 const notificationContainer = document.getElementById("notificationContainer");
 
+const name = document.getElementById("name");
 const email = document.getElementById("email");
 const password = document.getElementById("password");
 const loginBtn = document.getElementById("loginBtn");
@@ -25,6 +26,7 @@ const logoutBtn = document.getElementById("logoutBtn");
 
 const authCard = document.getElementById("authCard");
 const userBar = document.getElementById("userBar");
+const userName = document.getElementById("userName");
 const userEmail = document.getElementById("userEmail");
 
 const verificationCard = document.getElementById("verificationCard");
@@ -230,8 +232,15 @@ async function login() {
 }
 
 async function register() {
+    const nameValue = name.value.trim();
     const emailValue = email.value.trim();
     const passwordValue = password.value;
+
+    if (!nameValue) {
+        showToast("Please enter your name", "error");
+        name.focus();
+        return;
+    }
 
     if (!emailValue || !passwordValue) {
         showToast("Please enter email and password", "error");
@@ -255,6 +264,9 @@ async function register() {
         email: emailValue,
         password: passwordValue,
         options: {
+            data: {
+                full_name: nameValue
+            },
             emailRedirectTo: window.location.origin
         }
     });
@@ -339,6 +351,7 @@ async function logout() {
 // ============================================
 
 function showVerificationScreen(emailValue) {
+    name.value = "";
     email.value = "";
     password.value = "";
     verificationEmail.textContent = emailValue;
@@ -365,6 +378,7 @@ function handleAuthStateChange(session) {
         // User is logged out
         currentUser = null;
         todoList.innerHTML = "";
+        userName.textContent = "";
         userEmail.textContent = "";
         
         authCard.classList.remove("hidden");
@@ -373,11 +387,13 @@ function handleAuthStateChange(session) {
         inputContainer.classList.add("hidden");
         unsubscribeFromTodos();
 
+        name.value = "";
         email.value = "";
         password.value = "";
     } else {
         // User is logged in
         currentUser = session.user;
+        userName.textContent = session.user.user_metadata?.full_name || "";
         userEmail.textContent = session.user.email;
         
         authCard.classList.add("hidden");
@@ -400,6 +416,12 @@ logoutBtn.addEventListener("click", logout);
 addBtn.addEventListener("click", addTodo);
 backToAuthBtn.addEventListener("click", hideVerificationScreen);
 resendBtn.addEventListener("click", resendConfirmationEmail);
+
+name.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        email.focus();
+    }
+});
 
 email.addEventListener("keydown", e => {
     if (e.key === "Enter") {
