@@ -1,10 +1,16 @@
-// Deine Supabase Verbindungsdaten
+// ============================================
+// SUPABASE CONFIGURATION
+// ============================================
+
 const SUPABASE_URL = "https://azjolejrfglvqwuqoxyt.supabase.co"; 
 const SUPABASE_KEY = "sb_publishable_eEfPK72iOaXYEZjhhdh1zA_0IMWBUya"; 
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// DOM-Elemente holen
+// ============================================
+// DOM ELEMENTS
+// ============================================
+
 const todoInput = document.getElementById("todoInput");
 const addBtn = document.getElementById("addBtn");
 const todoList = document.getElementById("todoList");
@@ -21,15 +27,21 @@ const authCard = document.getElementById("authCard");
 const userBar = document.getElementById("userBar");
 const userEmail = document.getElementById("userEmail");
 
+// ============================================
+// STATE
+// ============================================
+
 let currentUser = null;
 let todoSubscription = null;
 
-// --- FUNKTION FÜR SCHICKE FEHLERMELDUNGEN (TOASTS) ---
+// ============================================
+// NOTIFICATIONS / TOASTS
+// ============================================
+
 function showToast(message, type = "error") {
     const toast = document.createElement("div");
     toast.className = `toast ${type}`;
 
-    // Icon je nach Typ auswählen
     const icon = type === "success" ? "ph-check-circle" : "ph-warning-circle";
 
     toast.innerHTML = `
@@ -39,15 +51,16 @@ function showToast(message, type = "error") {
 
     notificationContainer.appendChild(toast);
 
-    // Nach 4 Sekunden automatisch ausblenden und löschen
     setTimeout(() => {
         toast.style.opacity = "0";
-        toast.style.transform = "scale(0.95)";
+        toast.style.transform = "translateX(420px)";
         setTimeout(() => toast.remove(), 300);
     }, 4000);
 }
 
-// --- TO-DO STRUKTUR & FUNKTIONEN ---
+// ============================================
+// TODO MANAGEMENT
+// ============================================
 
 async function loadTodos() {
     if (!currentUser) return;
@@ -56,50 +69,61 @@ async function loadTodos() {
     const { data, error } = await supabase
         .from("todos")
         .select("*")
+        .eq("user_id", currentUser.id)
         .order("created_at", { ascending: false });
 
     if (error) {
-        showToast("Fehler beim Laden der Aufgaben: " + error.message, "error");
+        console.error("Error loading todos:", error);
+        showToast("Failed to load tasks: " + error.message, "error");
         return;
     }
 
-    if (data) {
+    if (data && data.length > 0) {
         data.forEach(renderTodo);
+    } else {
+        todoList.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px 20px;">No tasks yet. Create your first one below!</p>';
     }
 }
 
 function renderTodo(todo) {
     const item = document.createElement("div");
     item.className = todo.completed ? "todo-item completed" : "todo-item";
+    item.dataset.todoId = todo.id;
 
     item.innerHTML = `
-        <button class="icon-btn check-btn">
-            <i class="ph ${todo.completed ? "ph-check-circle" : "ph-circle"}"></i>
+        <button class="icon-btn check-btn" title="${todo.completed ? 'Mark incomplete' : 'Mark complete'}">
+            <i class="ph ${todo.completed ? "ph-check-circle-fill" : "ph-circle"}"></i>
         </button>
-        <span class="todo-text">${todo.text}</span>
-        <button class="icon-btn delete-btn">
+        <span class="todo-text">${escapeHtml(todo.text)}</span>
+        <button class="icon-btn delete-btn" title="Delete task">
             <i class="ph ph-trash"></i>
         </button>
     `;
 
-    // Status ändern
+    // Toggle completion status
     item.querySelector(".check-btn").addEventListener("click", async () => {
         const { error } = await supabase
             .from("todos")
             .update({ completed: !todo.completed })
             .eq("id", todo.id);
         
-        if (error) showToast("Änderung fehlgeschlagen: " + error.message, "error");
+        if (error) {
+            console.error("Error updating todo:", error);
+            showToast("Failed to update task: " + error.message, "error");
+        }
     });
 
-    // To-Do löschen
+    // Delete todo
     item.querySelector(".delete-btn").addEventListener("click", async () => {
         const { error } = await supabase
             .from("todos")
             .delete()
             .eq("id", todo.id);
 
-        if (error) showToast("Löschen fehlgeschlagen: " + error.message, "error");
+        if (error) {
+            console.error("Error deleting todo:", error);
+            showToast("Failed to delete task: " + error.message, "error");
+        }
     });
 
     todoList.appendChild(item);
@@ -109,21 +133,30 @@ async function addTodo() {
     const text = todoInput.value.trim();
     if (!text || !currentUser) return;
 
+    // Disable button during submission
+    addBtn.disabled = true;
+
     const { error } = await supabase
         .from("todos")
         .insert({
             text,
-            user_id: currentUser.id
+            user_id: currentUser.id,
+            completed: false
         });
 
+    addBtn.disabled = false;
+
     if (error) {
-        showToast("Fehler beim Erstellen: " + error.message, "error");
+        console.error("Error adding todo:", error);
+        showToast("Failed to create task: " + error.message, "error");
     } else {
         todoInput.value = "";
+        todoInput.focus();
+        showToast("Task added!", "success");
     }
 }
 
-// Real-time Verbindung für Live-Updates (postgres_changes)
+// Subscribe to real-time updates
 function subscribeToTodos() {
     if (todoSubscription) {
         supabase.removeChannel(todoSubscription);
@@ -131,7 +164,12 @@ function subscribeToTodos() {
 
     todoSubscription = supabase
         .channel('public:todos')
-        .on('postgres_changes', { event: '*', filter: `user_id=eq.${currentUser.id}`, schema: 'public', table: 'todos' }, () => {
+        .on('postgres_changes', { 
+            event: '*', 
+            schema: 'public', 
+            table: 'todos',
+            filter: `user_id=eq.${currentUser.id}`
+        }, () => {
             loadTodos(); 
         })
         .subscribe();
@@ -144,46 +182,94 @@ function unsubscribeFromTodos() {
     }
 }
 
-// --- AUTH STRUKTUR ---
+// ============================================
+// AUTHENTICATION
+// ============================================
 
 async function login() {
-    const { error } = await supabase.auth.signInWithPassword({
-        email: email.value,
-        password: password.value
+    const emailValue = email.value.trim();
+    const passwordValue = password.value;
+
+    if (!emailValue || !passwordValue) {
+        showToast("Please enter email and password", "error");
+        return;
+    }
+
+    loginBtn.disabled = true;
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailValue,
+        password: passwordValue
     });
 
+    loginBtn.disabled = false;
+
     if (error) {
-        showToast("Login fehlgeschlagen: " + error.message, "error");
+        console.error("Login error:", error);
+        showToast("Sign in failed: " + error.message, "error");
     } else {
-        showToast("Erfolgreich angemeldet!", "success");
+        showToast("Welcome back!", "success");
+        // UI will update automatically via onAuthStateChange
     }
 }
 
 async function register() {
-    const { error } = await supabase.auth.signUp({
-        email: email.value,
-        password: password.value,
+    const emailValue = email.value.trim();
+    const passwordValue = password.value;
+
+    if (!emailValue || !passwordValue) {
+        showToast("Please enter email and password", "error");
+        return;
+    }
+
+    if (passwordValue.length < 6) {
+        showToast("Password must be at least 6 characters", "error");
+        return;
+    }
+
+    registerBtn.disabled = true;
+
+    const { data, error } = await supabase.auth.signUp({
+        email: emailValue,
+        password: passwordValue,
         options: {
             emailRedirectTo: window.location.origin
         }
     });
 
+    registerBtn.disabled = false;
+
     if (error) {
-        showToast("Registrierung fehlgeschlagen: " + error.message, "error");
+        console.error("Registration error:", error);
+        showToast("Registration failed: " + error.message, "error");
     } else {
-        showToast("Erfolgreich! Bitte bestätige den Link in deinem E-Mail-Postfach.", "success");
+        showToast("Registration successful! Check your email to confirm.", "success");
+        email.value = "";
+        password.value = "";
     }
 }
 
 async function logout() {
+    logoutBtn.disabled = true;
     unsubscribeFromTodos();
-    await supabase.auth.signOut();
-    showToast("Erfolgreich abgemeldet.", "success");
+    
+    const { error } = await supabase.auth.signOut();
+    
+    logoutBtn.disabled = false;
+
+    if (error) {
+        console.error("Logout error:", error);
+        showToast("Logout failed: " + error.message, "error");
+    } else {
+        showToast("Signed out successfully", "success");
+        // UI will update automatically via onAuthStateChange
+    }
 }
 
-// Steuert, welche UI-Elemente je nach Login-Status sichtbar sind
+// Handle authentication state changes
 function handleAuthStateChange(session) {
     if (!session) {
+        // User is logged out
         currentUser = null;
         todoList.innerHTML = "";
         userEmail.textContent = "";
@@ -192,7 +278,11 @@ function handleAuthStateChange(session) {
         userBar.classList.add("hidden");
         inputContainer.classList.add("hidden");
         unsubscribeFromTodos();
+
+        email.value = "";
+        password.value = "";
     } else {
+        // User is logged in
         currentUser = session.user;
         userEmail.textContent = session.user.email;
         
@@ -205,11 +295,26 @@ function handleAuthStateChange(session) {
     }
 }
 
-// Event-Listeners registrieren
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
 loginBtn.addEventListener("click", login);
 registerBtn.addEventListener("click", register);
 logoutBtn.addEventListener("click", logout);
 addBtn.addEventListener("click", addTodo);
+
+email.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        password.focus();
+    }
+});
+
+password.addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+        login();
+    }
+});
 
 todoInput.addEventListener("keydown", e => {
     if (e.key === "Enter") {
@@ -217,7 +322,21 @@ todoInput.addEventListener("keydown", e => {
     }
 });
 
-// Automatische Erkennung ob User bereits eingeloggt ist beim Neuladen
+// ============================================
+// INITIALIZATION
+// ============================================
+
+// Check for existing session on page load
 supabase.auth.onAuthStateChange((event, session) => {
     handleAuthStateChange(session);
 });
+
+// ============================================
+// UTILITIES
+// ============================================
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
