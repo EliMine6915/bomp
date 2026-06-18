@@ -27,12 +27,20 @@ const authCard = document.getElementById("authCard");
 const userBar = document.getElementById("userBar");
 const userEmail = document.getElementById("userEmail");
 
+const verificationCard = document.getElementById("verificationCard");
+const verificationEmail = document.getElementById("verificationEmail");
+const backToAuthBtn = document.getElementById("backToAuthBtn");
+const resendBtn = document.getElementById("resendBtn");
+const resendHint = document.getElementById("resendHint");
+
 // ============================================
 // STATE
 // ============================================
 
 let currentUser = null;
 let todoSubscription = null;
+let registeredEmail = null;
+let resendCountdown = 0;
 
 // ============================================
 // NOTIFICATIONS / TOASTS
@@ -133,7 +141,6 @@ async function addTodo() {
     const text = todoInput.value.trim();
     if (!text || !currentUser) return;
 
-    // Disable button during submission
     addBtn.disabled = true;
 
     const { error } = await supabase
@@ -206,10 +213,19 @@ async function login() {
 
     if (error) {
         console.error("Login error:", error);
-        showToast("Sign in failed: " + error.message, "error");
+        
+        if (error.message.includes("Email not confirmed")) {
+            showToast("Please confirm your email address first", "error");
+            // Show verification screen
+            registeredEmail = emailValue;
+            showVerificationScreen(emailValue);
+        } else if (error.message.includes("Invalid login credentials")) {
+            showToast("Invalid email or password", "error");
+        } else {
+            showToast("Sign in failed: " + error.message, "error");
+        }
     } else {
         showToast("Welcome back!", "success");
-        // UI will update automatically via onAuthStateChange
     }
 }
 
@@ -227,6 +243,12 @@ async function register() {
         return;
     }
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(emailValue)) {
+        showToast("Please enter a valid email address", "error");
+        return;
+    }
+
     registerBtn.disabled = true;
 
     const { data, error } = await supabase.auth.signUp({
@@ -241,11 +263,58 @@ async function register() {
 
     if (error) {
         console.error("Registration error:", error);
-        showToast("Registration failed: " + error.message, "error");
+        
+        if (error.message.includes("already registered")) {
+            showToast("This email is already registered. Please log in instead.", "error");
+        } else if (error.message.includes("invalid")) {
+            showToast("Invalid email format", "error");
+        } else {
+            showToast("Registration failed: " + error.message, "error");
+        }
     } else {
-        showToast("Registration successful! Check your email to confirm.", "success");
-        email.value = "";
-        password.value = "";
+        // Show verification screen
+        registeredEmail = emailValue;
+        showVerificationScreen(emailValue);
+        showToast("Check your email to confirm registration!", "success");
+    }
+}
+
+async function resendConfirmationEmail() {
+    if (!registeredEmail) return;
+    
+    if (resendCountdown > 0) {
+        showToast(`Wait ${resendCountdown} seconds before resending`, "error");
+        return;
+    }
+
+    resendBtn.disabled = true;
+
+    const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: registeredEmail
+    });
+
+    if (error) {
+        console.error("Resend error:", error);
+        showToast("Failed to resend: " + error.message, "error");
+        resendBtn.disabled = false;
+    } else {
+        showToast("Confirmation email sent!", "success");
+        
+        // Start countdown
+        resendCountdown = 60;
+        resendBtn.textContent = "Resend (" + resendCountdown + "s)";
+        
+        const interval = setInterval(() => {
+            resendCountdown--;
+            if (resendCountdown <= 0) {
+                clearInterval(interval);
+                resendBtn.textContent = "Resend confirmation";
+                resendBtn.disabled = false;
+            } else {
+                resendBtn.textContent = "Resend (" + resendCountdown + "s)";
+            }
+        }, 1000);
     }
 }
 
@@ -262,11 +331,35 @@ async function logout() {
         showToast("Logout failed: " + error.message, "error");
     } else {
         showToast("Signed out successfully", "success");
-        // UI will update automatically via onAuthStateChange
     }
 }
 
-// Handle authentication state changes
+// ============================================
+// UI STATE MANAGEMENT
+// ============================================
+
+function showVerificationScreen(emailValue) {
+    email.value = "";
+    password.value = "";
+    verificationEmail.textContent = emailValue;
+    
+    authCard.classList.add("hidden");
+    verificationCard.classList.remove("hidden");
+    userBar.classList.add("hidden");
+    inputContainer.classList.add("hidden");
+    
+    resendCountdown = 0;
+    resendBtn.disabled = false;
+    resendBtn.textContent = "Resend confirmation";
+}
+
+function hideVerificationScreen() {
+    verificationCard.classList.add("hidden");
+    authCard.classList.remove("hidden");
+    registeredEmail = null;
+    resendCountdown = 0;
+}
+
 function handleAuthStateChange(session) {
     if (!session) {
         // User is logged out
@@ -275,6 +368,7 @@ function handleAuthStateChange(session) {
         userEmail.textContent = "";
         
         authCard.classList.remove("hidden");
+        verificationCard.classList.add("hidden");
         userBar.classList.add("hidden");
         inputContainer.classList.add("hidden");
         unsubscribeFromTodos();
@@ -287,6 +381,7 @@ function handleAuthStateChange(session) {
         userEmail.textContent = session.user.email;
         
         authCard.classList.add("hidden");
+        verificationCard.classList.add("hidden");
         userBar.classList.remove("hidden");
         inputContainer.classList.remove("hidden");
         
@@ -303,6 +398,8 @@ loginBtn.addEventListener("click", login);
 registerBtn.addEventListener("click", register);
 logoutBtn.addEventListener("click", logout);
 addBtn.addEventListener("click", addTodo);
+backToAuthBtn.addEventListener("click", hideVerificationScreen);
+resendBtn.addEventListener("click", resendConfirmationEmail);
 
 email.addEventListener("keydown", e => {
     if (e.key === "Enter") {
@@ -326,8 +423,19 @@ todoInput.addEventListener("keydown", e => {
 // INITIALIZATION
 // ============================================
 
+// Check for verification token in URL
+window.addEventListener('load', async () => {
+    const hash = window.location.hash;
+    
+    if (hash.includes('type=signup') || hash.includes('access_token')) {
+        // URL has auth callback, let Supabase handle it
+        const result = await supabase.auth.getSession();
+    }
+});
+
 // Check for existing session on page load
 supabase.auth.onAuthStateChange((event, session) => {
+    console.log("Auth event:", event);
     handleAuthStateChange(session);
 });
 
