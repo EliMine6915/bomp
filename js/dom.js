@@ -1,0 +1,19 @@
+export const elements = {
+    todoInput: document.getElementById("todoInput"),
+    tagline: document.getElementById("tagline"),
+    settingsButton: document.getElementById("settingsButton"),
+    addBtn: document.getElementById("addBtn"),
+    todoList: document.getElementById("todoList"),
+    inputContainer: document.getElementById("inputContainer"),
+    notificationContainer: document.getElementById("notificationContainer"),
+    nameInput: document.getElementById("name"),
+    nameGroup: document.getElementById("nameGroup"),
+    emailInput: document.getElementById("email"),
+    passwordInput: document.getElementById("password"),
+    toggleLoginTab: document.getElementById("toggleLoginTab"),
+    toggleRegisterTab: document.getElementById("toggleRegisterTab"),
+    authTitle: document.getElementById("authTitle"),
+    submitAuthBtn: document.getElementById("submitAuthBtn"),
+    submitAuthText: document.getElementById("submitAuthText"),
+    authCard: document.getElementById("authCard")
+};

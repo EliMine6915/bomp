@@ -69,6 +69,26 @@ h2 {
     text-align: center;
 }
 
+.settings-button {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 20;
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-items: center;
+    color: var(--text-secondary);
+    font-size: 24px;
+    text-decoration: none;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.settings-button:hover {
+    color: var(--accent);
+    transform: rotate(18deg);
+}
+
 .tagline {
     font-size: 0.95rem;
     color: var(--text-secondary);
@@ -121,6 +141,7 @@ h2 {
 }
 
 .auth-card input,
+.settings-panel input,
 #todoInput {
     background: var(--bg-secondary);
     border: 1px solid var(--border);
@@ -134,11 +155,13 @@ h2 {
 }
 
 .auth-card input::placeholder,
+.settings-panel input::placeholder,
 #todoInput::placeholder {
     color: var(--text-muted);
 }
 
 .auth-card input:focus,
+.settings-panel input:focus,
 #todoInput:focus {
     border-color: var(--accent);
     background: var(--surface);
@@ -228,7 +251,7 @@ h2 {
     cursor: not-allowed;
 }
 
-/* --- USER BAR --- */
+/* --- USER INFO --- */
 
 .user-bar {
     display: flex;
@@ -240,6 +263,12 @@ h2 {
     border-radius: 16px;
     border: 1px solid var(--border);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .user-info {
@@ -259,20 +288,116 @@ h2 {
     line-height: 1.3;
 }
 
-#userName {
+#settingsUserName {
     font-size: 14px;
     color: var(--text);
     font-weight: 600;
 }
 
-#userName:empty {
+#settingsUserName:empty {
     display: none;
 }
 
-#userEmail {
+#settingsUserEmail {
     font-size: 13px;
     color: var(--text-secondary);
     font-weight: 500;
+}
+
+/* --- SETTINGS --- */
+
+.settings-app {
+    padding-bottom: 64px;
+}
+
+.page-topbar {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 28px;
+}
+
+.compact-btn {
+    flex: initial;
+    width: fit-content;
+    text-decoration: none;
+}
+
+.settings-header {
+    margin-bottom: 32px;
+}
+
+.settings-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 36px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.settings-user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin-bottom: 28px;
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-bottom: 28px;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+}
+
+.settings-section:last-child {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    border-bottom: none;
+}
+
+.settings-section h2 {
+    margin-bottom: 6px;
+}
+
+.settings-copy {
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.settings-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+}
+
+.settings-empty i {
+    color: var(--accent);
+    font-size: 44px;
+}
+
+.settings-empty h2 {
+    margin-bottom: 0;
+}
+
+.settings-empty p {
+    color: var(--text-secondary);
+}
+
+.settings-danger {
+    color: var(--text);
+}
+
+.danger-btn:hover:not(:disabled) {
+    background: var(--error-light);
+    border-color: var(--error);
+    color: var(--error);
 }
 
 /* --- TODO LIST --- */
@@ -476,18 +601,6 @@ h2 {
     }
 }
 
-/* --- VERIFICATION SCREEN SPECIFIC --- */
-
-#verificationCard ol {
-    margin-left: 16px;
-    margin-top: 8px;
-    color: inherit;
-}
-
-#verificationCard li {
-    margin-bottom: 4px;
-}
-
 /* --- UTILITY CLASSES --- */
 
 .hidden {
@@ -537,6 +650,11 @@ h2 {
         left: 8px;
         right: 8px;
         width: auto;
+    }
+
+    .settings-button {
+        top: 14px;
+        right: 14px;
     }
 
     .toast {

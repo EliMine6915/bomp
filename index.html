@@ -16,11 +16,14 @@
 <body>
 
     <div class="notification-container" id="notificationContainer"></div>
+    <a href="settings" class="settings-button hidden" id="settingsButton" title="Settings" aria-label="Settings">
+        <i class="ph ph-gear-six"></i>
+    </a>
 
     <div class="app">
         <div class="header">
             <h1>bomp</h1>
-            <p class="tagline">Manage your tasks with elegance</p>
+            <p class="tagline" id="tagline">Manage your tasks with elegance</p>
         </div>
 
         <div class="auth-card" id="authCard">
@@ -39,61 +42,21 @@
 
                 <div class="input-group">
                     <label for="email">E-Mail</label>
-                    <input type="email" id="email" placeholder="your@email.com" required>
+                    <input type="email" id="email" placeholder="your@email.com" autocomplete="email" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="At least 6 characters" autocomplete="current-password" required>
                 </div>
 
                 <div class="auth-buttons">
                     <button id="submitAuthBtn" class="btn btn-primary" style="width: 100%;">
-                        <i class="ph ph-paper-plane-tilt"></i>
-                        <span id="submitAuthText">Send Code</span>
+                        <i class="ph ph-sign-in"></i>
+                        <span id="submitAuthText">Sign In</span>
                     </button>
                 </div>
             </div>
-        </div>
-
-        <div class="auth-card hidden" id="verificationCard">
-            <div class="auth-form">
-                <div style="text-align: center; margin-bottom: 24px;">
-                    <i class="ph ph-envelope-open" style="font-size: 48px; color: var(--accent); margin-bottom: 12px; display: block;"></i>
-                    <h2 style="margin-bottom: 8px;">Check Your Email</h2>
-                    <p style="color: var(--text-secondary); font-size: 14px;">
-                        We've sent an 8-digit verification code to:<br>
-                        <strong id="verificationEmail" style="color: var(--accent);"></strong>
-                    </p>
-                </div>
-
-                <div class="input-group" style="margin-bottom: 20px;">
-                    <label for="otpCode">Enter 8-digit Code</label>
-                    <input type="text" id="otpCode" placeholder="12345678" style="text-align: center; font-size: 20px; letter-spacing: 4px;" autocomplete="one-time-code">
-                </div>
-
-                <button id="verifyOtpBtn" class="btn btn-primary" style="width: 100%; margin-bottom: 16px;">
-                    <i class="ph ph-check-circle"></i>
-                    Verify & Continue
-                </button>
-
-                <button id="backToAuthBtn" class="btn btn-secondary" style="width: 100%;">
-                    <i class="ph ph-arrow-left"></i>
-                    Back
-                </button>
-
-                <div class="auth-hint" style="margin-top: 16px;">
-                    <p id="resendHint">Didn't receive a code? <button id="resendBtn" style="background: none; border: none; color: var(--accent); cursor: pointer; text-decoration: underline; padding: 0; font-family: inherit; font-size: inherit;">Resend code</button></p>
-                </div>
-            </div>
-        </div>
-
-        <div class="user-bar hidden" id="userBar">
-            <div class="user-info">
-                <i class="ph ph-user-circle"></i>
-                <div class="user-info-text">
-                    <span id="userName"></span>
-                    <span id="userEmail"></span>
-                </div>
-            </div>
-            <button id="logoutBtn" class="btn btn-icon" title="Sign Out">
-                <i class="ph ph-sign-out"></i>
-            </button>
         </div>
 
         <div class="todo-list" id="todoList"></div>
@@ -113,8 +76,7 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="script.js"></script>
+    <script type="module" src="js/main.js"></script>
 
 </body>
 </html>

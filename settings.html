@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>bomp - Settings</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+    <div class="notification-container" id="notificationContainer"></div>
+
+    <main class="app settings-app">
+        <div class="page-topbar">
+            <a href="./" class="btn btn-secondary compact-btn">
+                <i class="ph ph-arrow-left"></i>
+                Back
+            </a>
+        </div>
+
+        <div class="header settings-header">
+            <h1 id="settingsTitle">settings</h1>
+            <p class="tagline" id="settingsTagline">Account and preferences</p>
+        </div>
+
+        <section class="settings-panel" id="signedOutPanel">
+            <div class="settings-empty">
+                <i class="ph ph-lock-key"></i>
+                <h2>Sign in required</h2>
+                <p>Please sign in before opening settings.</p>
+                <a href="./" class="btn btn-primary">
+                    <i class="ph ph-sign-in"></i>
+                    Sign In
+                </a>
+            </div>
+        </section>
+
+        <section class="settings-panel hidden" id="settingsPanel">
+            <div class="settings-user-card">
+                <div class="user-info">
+                    <i class="ph ph-user-circle"></i>
+                    <div class="user-info-text">
+                        <span id="settingsUserName"></span>
+                        <span id="settingsUserEmail"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <div>
+                    <h2>Profile</h2>
+                    <p class="settings-copy" id="accountEmail"></p>
+                </div>
+
+                <div class="input-group">
+                    <label for="displayName">Name</label>
+                    <input type="text" id="displayName" placeholder="Your name" autocomplete="name">
+                </div>
+
+                <button id="saveProfileBtn" class="btn btn-primary">
+                    <i class="ph ph-floppy-disk"></i>
+                    Save Profile
+                </button>
+            </div>
+
+            <div class="settings-section">
+                <div>
+                    <h2>Security</h2>
+                    <p class="settings-copy">Send a password reset link to your account email.</p>
+                </div>
+
+                <button id="resetPasswordBtn" class="btn btn-secondary">
+                    <i class="ph ph-envelope"></i>
+                    Send Reset Email
+                </button>
+            </div>
+
+            <div class="settings-section settings-danger">
+                <div>
+                    <h2>Session</h2>
+                    <p class="settings-copy">Sign out on this device.</p>
+                </div>
+
+                <button id="settingsLogoutBtn" class="btn btn-secondary danger-btn">
+                    <i class="ph ph-sign-out"></i>
+                    Sign Out
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script type="module" src="js/settings.js"></script>
+</body>
+</html>
