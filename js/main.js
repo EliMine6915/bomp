@@ -5,7 +5,8 @@ import { setAuthMode, showSignedIn, showSignedOut } from "./ui.js";
 
 elements.toggleLoginTab.addEventListener("click", () => setAuthMode(false));
 elements.toggleRegisterTab.addEventListener("click", () => setAuthMode(true));
-elements.submitAuthBtn.addEventListener("click", submitAuth);
+elements.submitAuthBtn.addEventListener("click", handleAuthSubmit);
+elements.togglePasswordBtn.addEventListener("click", togglePasswordVisibility);
 elements.addBtn.addEventListener("click", addTodo);
 
 elements.nameInput.addEventListener("keydown", event => {
@@ -17,7 +18,7 @@ elements.emailInput.addEventListener("keydown", event => {
 });
 
 elements.passwordInput.addEventListener("keydown", event => {
-    if (event.key === "Enter") submitAuth();
+    if (event.key === "Enter") handleAuthSubmit();
 });
 
 elements.todoInput.addEventListener("keydown", event => {
@@ -36,3 +37,25 @@ watchAuthState(user => {
 });
 
 setAuthMode(false);
+
+async function handleAuthSubmit() {
+    const user = await submitAuth();
+
+    if (!user) return;
+
+    showSignedIn(user);
+    startTodoSync(user);
+}
+
+function togglePasswordVisibility() {
+    const isPasswordHidden = elements.passwordInput.type === "password";
+    const icon = elements.togglePasswordBtn.querySelector("i");
+
+    elements.passwordInput.type = isPasswordHidden ? "text" : "password";
+    elements.togglePasswordBtn.setAttribute(
+        "aria-label",
+        isPasswordHidden ? "Hide password" : "Show password"
+    );
+    elements.togglePasswordBtn.title = isPasswordHidden ? "Hide password" : "Show password";
+    icon.className = `ph ${isPasswordHidden ? "ph-eye-slash" : "ph-eye"}`;
+}

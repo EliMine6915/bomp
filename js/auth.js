@@ -49,14 +49,16 @@ export async function submitAuth() {
             const credential = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(credential.user, { displayName: name });
             showToast("Account created successfully", "success");
-            return;
+            return credential.user;
         }
 
-        await signInWithEmailAndPassword(auth, email, password);
+        const credential = await signInWithEmailAndPassword(auth, email, password);
         showToast("Signed in successfully", "success");
+        return credential.user;
     } catch (error) {
         console.error("Firebase auth error:", error);
         showToast(getAuthErrorMessage(error), "error");
+        return null;
     } finally {
         elements.submitAuthBtn.disabled = false;
     }

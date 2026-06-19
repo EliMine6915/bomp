@@ -10,6 +10,7 @@ export const elements = {
     nameGroup: document.getElementById("nameGroup"),
     emailInput: document.getElementById("email"),
     passwordInput: document.getElementById("password"),
+    togglePasswordBtn: document.getElementById("togglePasswordBtn"),
     toggleLoginTab: document.getElementById("toggleLoginTab"),
     toggleRegisterTab: document.getElementById("toggleRegisterTab"),
     authTitle: document.getElementById("authTitle"),
