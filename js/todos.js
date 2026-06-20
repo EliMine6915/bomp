@@ -12,7 +12,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import { db } from "./firebase-app.js";
 import { elements } from "./dom.js";
-import { escapeHtml, showEmptyTodos, showToast } from "./ui.js";
+import { escapeHtml, showEmptyTodos, showToast, updateCompletedSection } from "./ui.js";
 
 let currentUser = null;
 let unsubscribeTodos = null;
@@ -21,6 +21,7 @@ export function startTodoSync(user) {
     stopTodoSync();
     currentUser = user;
     elements.todoList.innerHTML = "";
+    elements.completedList.innerHTML = "";
 
     const todosQuery = query(
         collection(db, "todos"),
@@ -32,18 +33,26 @@ export function startTodoSync(user) {
         todosQuery,
         snapshot => {
             elements.todoList.innerHTML = "";
+            elements.completedList.innerHTML = "";
 
             if (snapshot.empty) {
                 showEmptyTodos(currentUser);
+                updateCompletedSection(0);
                 return;
             }
 
+            const activeTodos = [];
+            const completedTodos = [];
+
             snapshot.forEach(documentSnapshot => {
-                renderTodo({
-                    id: documentSnapshot.id,
-                    ...documentSnapshot.data()
-                });
+                const todo = { id: documentSnapshot.id, ...documentSnapshot.data() };
+                (todo.completed ? completedTodos : activeTodos).push(todo);
             });
+
+            activeTodos.forEach(todo => renderTodo(todo, elements.todoList));
+            completedTodos.forEach(todo => renderTodo(todo, elements.completedList));
+
+            updateCompletedSection(completedTodos.length);
         },
         error => {
             console.error("Error loading todos:", error);
@@ -86,7 +95,7 @@ export async function addTodo() {
     }
 }
 
-function renderTodo(todo) {
+function renderTodo(todo, container) {
     const item = document.createElement("div");
     item.className = todo.completed ? "todo-item completed" : "todo-item";
     item.dataset.todoId = todo.id;
@@ -121,5 +130,5 @@ function renderTodo(todo) {
         }
     });
 
-    elements.todoList.appendChild(item);
+    container.appendChild(item);
 }
