@@ -465,7 +465,55 @@ h2 {
 }
 
 .todo-item.completed {
-    opacity: 0.7;
+    background: var(--success-light);
+    border-color: #c5e1c8;
+    opacity: 1;
+}
+
+.todo-item.completed .todo-text {
+    text-decoration: line-through;
+    color: var(--text-muted);
+}
+
+/* --- COMPLETED DROPDOWN --- */
+
+.completed-section {
+    margin-top: 8px;
+}
+
+.completed-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+    cursor: pointer;
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
+}
+
+.completed-toggle:hover {
+    border-color: var(--accent-light);
+    color: var(--text);
+}
+
+.completed-toggle i {
+    font-size: 18px;
+    transition: transform 0.25s ease;
+}
+
+.completed-toggle.open i {
+    transform: rotate(180deg);
+}
+
+.completed-list {
+    margin-top: 12px;
 }
 
 .todo-text {
