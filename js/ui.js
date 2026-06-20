@@ -40,6 +40,11 @@ export function showToast(message, type = "error") {
 
 export function showSignedOut() {
     elements.todoList.innerHTML = "";
+    elements.completedList.innerHTML = "";
+    elements.completedList.classList.add("hidden");
+    elements.completedSection.classList.add("hidden");
+    elements.completedToggle.classList.remove("open");
+    elements.completedToggleText.textContent = "Completed (0)";
     elements.tagline.textContent = "Manage your tasks with elegance";
     elements.todoInput.placeholder = "Add a new task...";
     elements.authCard.classList.remove("hidden");
@@ -48,6 +53,16 @@ export function showSignedOut() {
     elements.nameInput.value = "";
     elements.emailInput.value = "";
     elements.passwordInput.value = "";
+}
+
+export function updateCompletedSection(count) {
+    elements.completedSection.classList.toggle("hidden", count === 0);
+    elements.completedToggleText.textContent = `Completed (${count})`;
+}
+
+export function toggleCompletedSection() {
+    elements.completedList.classList.toggle("hidden");
+    elements.completedToggle.classList.toggle("open");
 }
 
 export function showSignedIn(user) {
