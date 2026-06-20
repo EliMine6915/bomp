@@ -1,13 +1,14 @@
 import { elements } from "./dom.js";
 import { submitAuth, watchAuthState } from "./auth.js";
 import { addTodo, startTodoSync, stopTodoSync } from "./todos.js";
-import { setAuthMode, showSignedIn, showSignedOut } from "./ui.js";
+import { setAuthMode, showSignedIn, showSignedOut, toggleCompletedSection } from "./ui.js";
 
 elements.toggleLoginTab.addEventListener("click", () => setAuthMode(false));
 elements.toggleRegisterTab.addEventListener("click", () => setAuthMode(true));
 elements.submitAuthBtn.addEventListener("click", handleAuthSubmit);
 elements.togglePasswordBtn.addEventListener("click", togglePasswordVisibility);
 elements.addBtn.addEventListener("click", addTodo);
+elements.completedToggle.addEventListener("click", toggleCompletedSection);
 
 elements.nameInput.addEventListener("keydown", event => {
     if (event.key === "Enter") elements.emailInput.focus();
